@@ -1,7 +1,11 @@
 -- Instructions:
--- •	Test your code as you go by running the following command from your VS Code integrated terminal:
+-- Docker Desktop must be running.
+-- Start or re-start containers with the command: docker compose up -d (This will build the containers from the docker-compose.yaml file.)
+-- pg_container and pgadmin_container must be in status Up. (Use 'docker ps' command to confirm their status.)
+-- run the following to start the database:
 -- cat school_database.sql | docker exec -i pg_container psql
--- After running this command, refresh or open pgAdmin in your browser at http://localhost:5433 , then navigate to the 'school_database' database 
+-- After running this command, open pgAdmin in your browser at http://localhost:5433 , then navigate to the 'school_database' database 
+-- Once the pgAdmin dashboard finishes loading, click on 'Add New Server'. Add a Name in the General tab and add 'pg' as the Host name/address on the connection tab. Once complete, please click save.
 
 
 -- kill other connections
@@ -94,13 +98,14 @@ CREATE TABLE teacher_phone (
     phone_id SERIAL,
     phone_type TEXT NOT NULL,
     phone_number VARCHAR(50) NOT NULL,
-    student_id INT,
+    teacher_id INT,
     PRIMARY KEY (phone_id)
 );
 
 CREATE TABLE departments (
     department_id SERIAL,
     department_name TEXT NOT NULL,
+    department_description TEXT NOT NULL,
     PRIMARY KEY (department_id)
 );
 
@@ -114,7 +119,6 @@ CREATE TABLE students_classes (
 ---
 --- Add foreign key constraints
 ---
-
 
 -- For the One to Many Relationships:
 
@@ -158,3 +162,53 @@ ALTER TABLE students_classes
 ADD CONSTRAINT fk_students_classes_classes
 FOREIGN KEY (class_id) 
 REFERENCES classes (class_id);
+
+---
+--- Insert Entries into the Database
+---
+
+INSERT INTO students (first_name, last_name, email, start_date, end_date, mailing_address, physical_address, date_of_birth) VALUES 
+('Jane', 'Doe', 'jane@email.com', '2022-01-01', null, '123 Address Lane, City, AZ 00000', '123 Address Lane, City, AZ 00000', '1990-01-02'), ('John', 'Smith', 'john@email.com', '2018-01-01', '2022-01-01', '123 Street Ave, City, AZ 00000', '123 Street Ave, City, AZ 00000', '1991-01-12'), ('Alice', 'Sharp', 'alice@email.com', '2016-01-01', '2019-12-01', '123 Metro Ave, City, AZ 00000', '123 Metro Ave, City, AZ 00000', '1986-05-01');
+
+INSERT INTO student_phone (phone_type, phone_number, student_id) VALUES 
+('home', '123-456-7890', 1), ('cell', '098-765-4321', 1), ('home', '112-334-5500', 2), ('home', '009-887-6654', 3), ('cell', '121-343-4545', 3);
+
+INSERT INTO locations (building_name, building_address, room_number, room_phone, max_capacity) VALUES 
+('H.C. Academy Building 1', '123 Fake Lane, City, AZ 00001', '203', '123-456-9990', 24), ('H.C. Academy Building 1', '123 Fake Lane, City, AZ 00001', '211', '112-345-8800', 34), ('H.C. Academy Building 2', '124 Fake Lane, City, AZ 00001', '101', '110-332-9090', 70), ('H.C. Academy Building 2', '124 Fake Lane, City, AZ 00001', '102', '181-440-8790', 24);
+
+INSERT INTO departments (department_name, department_description) VALUES 
+('Math', 'Algebra, Geometry, and Calculus'), ('Science', 'Biology, Chemistry, and Physics'), ('Englishh', 'English Language and Literature');
+
+INSERT INTO teachers (first_name, last_name, email, start_date, end_date, status, physical_address, mailing_address, subjects_taught, level, department_id) VALUES 
+('Mark', 'Yates', 'mark@email.com', '2020-01-01', null, 'active', '345 School Street, City, AZ 00001', '345 School Street, City, AZ 00001', 'English Literature', 'Introductory', 3), ('Susan', 'Doe', 'susan@email.com', '2018-01-01', null, 'active', '789 Florence Road, City, AZ 00001', '789 Florence Road, City, AZ 00001', 'Physics', 'Introductory', 2), ('Terrance', 'Hu', 'terrance@email.com', '2018-01-01', null, 'active', '90 Domingo Road, City, AZ 00001', '90 Domingo Road, City, AZ 00001', 'Algebra', 'Introductory', 1);
+
+INSERT INTO teacher_phone (phone_type, phone_number, teacher_id) VALUES 
+('home', '121-990-1212', 1), ('cell', '990-880-7890', 1), ('home', '746-909-5678', 2), ('home', '148-976-1234', 3), ('cell', '232-149-3456', 3);
+
+INSERT INTO classes (class_name, start_date, end_date, class_time, credits, description, location_id, teacher_id, department_id) VALUES 
+('Algebra I', '2022-09-01', '2022-12-15', '12:30pm', 3, 'An introduction to Algebra', 1, 3, 1), ('Physics I', '2022-09-01', '2022-12-15', '1:00pm', 3, 'An introduction to Physics', 2, 2, 2), ('English I', '2022-09-01', '2022-12-15', '9:00am', 3, 'An introduction to English', 3, 1, 3), ('English I - Duplicate for Deletion', '2022-09-01', '2022-12-15', '9:00am', 3, 'An introduction to English', 3, 1, 3);
+
+INSERT INTO students_classes (student_id, class_id) VALUES 
+(1, 1), (1, 2), (2, 1), (2, 3), (3, 2), (3, 3);
+
+---
+--- Update a Record
+---
+
+UPDATE departments set department_name = 'English' 
+WHERE department_name = 'Englishh';
+
+---
+--- Delete a Record
+---
+
+DELETE FROM classes WHERE class_name = 'English I - Duplicate for Deletion';
+
+---
+--- Query Data Examples
+---
+
+-- All data from the departments table, in ascending order, based on the department_id:
+SELECT * FROM departments
+ORDER BY department_id ASC;
+
