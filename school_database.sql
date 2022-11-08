@@ -57,6 +57,7 @@ CREATE TABLE student_phone (
 CREATE TABLE classes (
     class_id SERIAL,
     class_name TEXT NOT NULL,
+    semester TEXT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     class_time TEXT NOT NULL,
@@ -109,10 +110,11 @@ CREATE TABLE departments (
     PRIMARY KEY (department_id)
 );
 
--- Many to Many Relationship table:
+-- Many to Many Relationship table with Grade:
 CREATE TABLE students_classes (
     student_id INT,
     class_id INT,
+    grade TEXT,
     PRIMARY KEY (student_id, class_id)
 );
 
@@ -185,11 +187,11 @@ INSERT INTO teachers (first_name, last_name, email, start_date, end_date, status
 INSERT INTO teacher_phone (phone_type, phone_number, teacher_id) VALUES 
 ('home', '121-990-1212', 1), ('cell', '990-880-7890', 1), ('home', '746-909-5678', 2), ('home', '148-976-1234', 3), ('cell', '232-149-3456', 3);
 
-INSERT INTO classes (class_name, start_date, end_date, class_time, credits, description, location_id, teacher_id, department_id) VALUES 
-('Algebra I', '2022-09-01', '2022-12-15', '12:30pm', 3, 'An introduction to Algebra', 1, 3, 1), ('Physics I', '2022-09-01', '2022-12-15', '1:00pm', 3, 'An introduction to Physics', 2, 2, 2), ('English I', '2022-09-01', '2022-12-15', '9:00am', 3, 'An introduction to English', 3, 1, 3), ('English I - Duplicate for Deletion', '2022-09-01', '2022-12-15', '9:00am', 3, 'An introduction to English', 3, 1, 3);
+INSERT INTO classes (class_name, semester, start_date, end_date, class_time, credits, description, location_id, teacher_id, department_id) VALUES 
+('Algebra I', 'FALL 2021', '2021-09-01', '2021-12-15', '12:30pm', 3, 'An introduction to Algebra', 1, 3, 1), ('Algebra III', 'FALL 2021', '2021-09-01', '2021-12-15', '10:30am', 3, 'An exploration of advanced topics in Algebra', 1, 3, 1), ('Physics I', 'FALL 2021', '2021-09-01', '2021-12-15', '1:00pm', 3, 'An introduction to Physics', 2, 2, 2), ('English I', 'FALL 2021', '2021-09-01', '2021-12-15', '9:00am', 3, 'An introduction to English', 3, 1, 3), ('English I - Duplicate for Deletion', 'FALL 2021',  '2021-09-01', '2021-12-15', '9:00am', 3, 'An introduction to English', 3, 1, 3);
 
-INSERT INTO students_classes (student_id, class_id) VALUES 
-(1, 1), (1, 2), (2, 1), (2, 3), (3, 2), (3, 3);
+INSERT INTO students_classes (student_id, class_id, grade) VALUES 
+(1, 1, 'A'), (1, 3, 'A-'), (2, 1, 'B+'), (2, 3, 'C'), (3, 2, 'A'), (3, 3, 'B');
 
 ---
 --- Update a Record
@@ -208,7 +210,40 @@ DELETE FROM classes WHERE class_name = 'English I - Duplicate for Deletion';
 --- Query Data Examples
 ---
 
--- All data from the departments table, in ascending order, based on the department_id:
+-- Select all entries from the departments table, in ascending order, based on the department_id:
 SELECT * FROM departments
 ORDER BY department_id ASC;
 
+
+-- Select all classes in the English department:
+-- Display the department_id and department_name from the departments table.
+-- Display the class_id, class_name, credits, and description from the classes table.
+SELECT b.department_id, b.department_name, a.class_id, a.class_name, a.credits, a.description FROM classes a
+INNER JOIN departments b
+ON a.department_id = b.department_id
+WHERE b.department_name = 'Math';
+
+
+-- Select the schedule of classes that were in building_name 'H.C. Academy Building 1', room_number '203' during the semester 'FALL 2021':
+-- Display the location_id from the locations table.
+-- Display the class_id, class_name, and class_time from the classes table.
+SELECT a.location_id, b.class_id, b.class_name, b.class_time
+FROM locations a 
+INNER JOIN classes b 
+ON a.location_id = b.location_id
+WHERE b.semester = 'FALL 2021' AND a.building_name = 'H.C. Academy Building 1' AND a.room_number = '203';
+
+
+-- Display a student's transcript:
+-- Select all classes student_id 1 is enrolled in. 
+-- Display the student_id, class_id, and grade from the students_classes table. 
+-- Display the class name, description, start_date, end_date, and credits from the classes table.
+-- Display the student first and last name from the students table, referring to them as student_first_name and student_last_name, respectively.
+-- Order by date of class, in descending order.
+SELECT a.student_id, c.first_name AS student_first_name, c.last_name AS student_last_name, a.class_id, b.description, b.start_date, b.end_date, b.credits, a.grade FROM students_classes a
+INNER JOIN classes b
+ON a.class_id = b.class_id
+INNER JOIN students c
+ON a.student_id = c.student_id
+WHERE a.student_id=1
+ORDER BY b.start_date DESC;
