@@ -1,13 +1,3 @@
--- Instructions:
--- Docker Desktop must be running.
--- Start or re-start containers with the command: docker compose up -d (This will build the containers from the docker-compose.yaml file.)
--- pg_container and pgadmin_container must be in status Up. (Use 'docker ps' command to confirm their status.)
--- run the following to start the database:
--- cat school_database.sql | docker exec -i pg_container psql
--- After running this command, open pgAdmin in your browser at http://localhost:5433 , then navigate to the 'school_database' database 
--- Once the pgAdmin dashboard finishes loading, click on 'Add New Server'. Add a Name in the General tab and add 'pg' as the Host name/address on the connection tab. Once complete, please click save.
-
-
 -- kill other connections
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
@@ -239,8 +229,8 @@ WHERE b.semester = 'FALL 2021' AND a.building_name = 'H.C. Academy Building 1' A
 -- Display the student_id, class_id, and grade from the students_classes table. 
 -- Display the class name, description, start_date, end_date, and credits from the classes table.
 -- Display the student first and last name from the students table, referring to them as student_first_name and student_last_name, respectively.
--- Order by date of class, in descending order.
-SELECT a.student_id, c.first_name AS student_first_name, c.last_name AS student_last_name, a.class_id, b.description, b.start_date, b.end_date, b.credits, a.grade FROM students_classes a
+-- Order by the start date of the class, in descending order.
+SELECT a.student_id, c.first_name AS student_first_name, c.last_name AS student_last_name, a.class_id, b.class_name, b.description, b.start_date, b.end_date, b.credits, a.grade FROM students_classes a
 INNER JOIN classes b
 ON a.class_id = b.class_id
 INNER JOIN students c
