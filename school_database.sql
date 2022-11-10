@@ -1,3 +1,5 @@
+-- Start of Code Adapted from NuCamp Curriculum:
+
 -- kill other connections
 SELECT pg_terminate_backend(pg_stat_activity.pid)
 FROM pg_stat_activity
@@ -18,6 +20,7 @@ SET client_min_messages = warning;
 SET default_tablespace = '';
 SET default_with_oids = false;
 
+-- End of Code Adapted from NuCamp Curriculum.
 
 ---
 --- CREATE tables

@@ -1,4 +1,5 @@
 # Configuration information used by Docker to start the pg_container (runs the SQL server application, Postgres) and pgadmin_container (runs the pgAdmin client application). 
+# Adapted from NuCamp curriculum.
 
 
 version: "3.8"

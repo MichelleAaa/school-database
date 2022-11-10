@@ -11,7 +11,7 @@ Please verify that docker desktop has been installed on your machine. If it hasn
 
 Open the file folder in VS code.
 
-Open Docker Desktop.
+Open Docker Desktop and wait for it to finish loading.
 
 In VS code, click View -> Terminal.
 
